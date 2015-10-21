@@ -35,37 +35,29 @@ syntax on
 "set textwidth=79
 set fileencodings=ucs-bom,cp936,utf-8,default,latin1
 
-" Vundle "
-filetype off
-
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-
-" let Vundle manage Vundle
-" required!
-Plugin 'gmarik/Vundle.vim'
+" vim-plug "
+call plug#begin('~/.vim/plugged')
 
 " My bundles here:
 " original repos on GitHub
-Plugin 'ctrlp.vim'
-Plugin 'EasyMotion'
-Plugin 'The-NERD-tree'
-Plugin 'vim-scripts/Mark--Karkat'
-Plugin 'emezeske/manpageview'
-"Plugin 'Valloric/YouCompleteMe'
-"Plugin 'rdnetto/YCM-Generator'
-"Plugin 'Syntastic'
-"Plugin 'Lokaltog/powerline'
-Plugin 'SuperTab'
-Plugin 'taglist.vim'
-"Plugin 'Tagbar'
-Plugin 'elzr/vim-json'
-"Plugin 'Rip-Rip/clang_complete'
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'tpope/vim-dispatch'
+Plug 'ctrlp.vim'
+Plug 'EasyMotion'
+Plug 'The-NERD-tree'
+Plug 'vim-scripts/Mark--Karkat'
+Plug 'emezeske/manpageview'
+"Plug 'Valloric/YouCompleteMe'
+"Plug 'rdnetto/YCM-Generator'
+"Plug 'Syntastic'
+"Plug 'Lokaltog/powerline'
+Plug 'SuperTab'
+Plug 'taglist.vim'
+"Plug 'Tagbar'
+"Plug 'elzr/vim-json'
+"Plug 'Rip-Rip/clang_complete'
+Plug 'christoomey/vim-tmux-navigator'
+"Plug 'tpope/vim-dispatch'
 
-call vundle#end()
-filetype plugin indent on
+call plug#end()
 
 " Tagbar "
 "nnoremap <silent> <F5> :TagbarOpen fj<CR>
