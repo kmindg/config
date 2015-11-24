@@ -103,9 +103,9 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 " #!/bin/bash
 " find . -type f -a \( -path "*interface*" -o -path "*disk/interface*" -o -path "*disk/fbe*" \) -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) > cscope.files || echo "find failed!"
 " ( cscope -Rbq -i cscope.files ) &
-" ( ctags --tag-relative=yes -L cscope.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
+" ( ctags -L cscope.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
 " wait
-nmap <silent> <Leader>u :!./cscope.tags.sh<CR>:cscope reset<CR>
+nmap <silent> <Leader>u :!./cscope.tags.sh<CR>:silent cscope reset<CR>
 
 " YouCompleteMe "
 "let g:ycm_key_invoke_completion = '<C-\>'
