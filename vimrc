@@ -40,7 +40,8 @@ call plug#begin('~/.vim/plugged')
 
 " My bundles here:
 " original repos on GitHub
-Plug 'ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'Felikz/ctrlp-py-matcher'
 Plug 'EasyMotion'
 Plug 'The-NERD-tree'
 Plug 'vim-scripts/Mark--Karkat'
@@ -97,8 +98,14 @@ nmap <Leader>se :cs find e <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sf :cs find f <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
 nmap <Leader>si :cs find i <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
 nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
-nmap <silent> <Leader>u :!find -L . -name "*.cc" -o -name "*.hh" -o -name "*.h" -o -name "*.c" -o -name "*.inc" > cscope.files<CR>:!cscope -Rbq -i cscope.files<CR>:cscope reset<CR>:!ctags --tag-relative=yes -L cscope.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore<CR><CR>
-nmap <silent> <Leader><Leader>u :!cscope -Rbq -i cscope.files<CR>:cscope reset<CR>:!ctags --tag-relative=yes -L cscope.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore<CR><CR>
+
+" cscope.tags.sh example:
+" #!/bin/bash
+" find . -type f -a \( -path "*interface*" -o -path "*disk/interface*" -o -path "*disk/fbe*" \) -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -n    ame "*.h" \) > cscope.files || echo "find failed!"
+" ( cscope -Rbq -i cscope.files ) &
+" ( ctags --tag-relative=yes -L cscope.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
+" wait
+nmap <silent> <Leader>u :!./cscope.tags.sh<CR>:cscope reset<CR>
 
 " YouCompleteMe "
 "let g:ycm_key_invoke_completion = '<C-\>'
@@ -119,6 +126,8 @@ nnoremap <leader>q :Bdelete<CR>
 " CtrlP "
 let g:ctrlp_working_path_mode = 0
 let g:ctrlp_by_filename = 1
+" ctrlp-py-matcher
+let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
 
 " mark "
 nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
@@ -131,7 +140,7 @@ let g:EasyMotion_keys = 'bceghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUV
 
 autocmd BufNewFile,BufRead *.ovsschema set filetype=json
 
-" The Silver Searcher
+" The Silver Searcher "
 if executable('ag')
   " Use ag over grep
   set grepprg=ag\ --nogroup\ --nocolor
@@ -143,7 +152,7 @@ if executable('ag')
   let g:ctrlp_use_caching = 0
 endif
 
-" clang_complete
+" clang_complete "
 "let g:clang_library_path="/home/agong/local/clang+llvm-3.4-x86_64-unknown-ubuntu12.04/lib/"
 "let g:clang_make_default_keymappings=0
 let g:clang_jumpto_declaration_key="<Leader>]"
