@@ -33,15 +33,15 @@ set hlsearch
 set cinoptions+=(0,:0,l1
 syntax on
 "set textwidth=79
-set fileencodings=ucs-bom,cp936,utf-8,default,latin1
+set fileencodings=ucs-bom,utf-8,cp936,default,latin1
 
 " vim-plug "
 call plug#begin('~/.vim/plugged')
 
 " My bundles here:
 " original repos on GitHub
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'Felikz/ctrlp-py-matcher'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 Plug 'EasyMotion'
 Plug 'The-NERD-tree'
 Plug 'vim-scripts/Mark--Karkat'
@@ -105,7 +105,7 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 " ( cscope -Rbq -i cscope.files ) &
 " ( ctags -L cscope.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
 " wait
-nmap <silent> <Leader>u :!./cscope.tags.sh<CR>:silent cscope reset<CR>
+nmap <silent> <Leader>u :!./cscope.tags.sh&<CR>:silent cscope reset<CR>
 
 " YouCompleteMe "
 "let g:ycm_key_invoke_completion = '<C-\>'
@@ -117,17 +117,6 @@ nmap <silent> <Leader>u :!./cscope.tags.sh<CR>:silent cscope reset<CR>
 
 " NERDTree "
 let NERDTreeChDirMode=2
-
-" bbye "
-set rtp+=~/.vim/plugin/bbye
-"nnoremap <leader>bd :Bdelete<CR>
-nnoremap <leader>q :Bdelete<CR>
-
-" CtrlP "
-let g:ctrlp_working_path_mode = 0
-let g:ctrlp_by_filename = 1
-" ctrlp-py-matcher
-let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
 
 " mark "
 nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
