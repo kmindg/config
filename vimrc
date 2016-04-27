@@ -34,6 +34,8 @@ set cinoptions+=(0,:0,l1
 syntax on
 "set textwidth=79
 set fileencodings=ucs-bom,utf-8,cp936,default,latin1
+set splitbelow
+set splitright
 
 " vim-plug "
 call plug#begin('~/.vim/plugged')
@@ -46,16 +48,16 @@ Plug 'EasyMotion'
 Plug 'The-NERD-tree'
 Plug 'vim-scripts/Mark--Karkat'
 Plug 'emezeske/manpageview'
-"Plug 'Valloric/YouCompleteMe'
+Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
+autocmd! User YouCompleteMe if !has('vim_starting') | call youcompleteme#Enable() | endif
 "Plug 'rdnetto/YCM-Generator'
-"Plug 'Syntastic'
-"Plug 'Lokaltog/powerline'
-Plug 'SuperTab'
+Plug 'Syntastic'
+"Plug 'SuperTab'
 Plug 'taglist.vim'
 "Plug 'Tagbar'
 "Plug 'elzr/vim-json'
 "Plug 'Rip-Rip/clang_complete'
-Plug 'christoomey/vim-tmux-navigator'
+"Plug 'christoomey/vim-tmux-navigator'
 "Plug 'tpope/vim-dispatch'
 
 call plug#end()
@@ -150,3 +152,26 @@ let g:clang_jumpto_back_key="<Leader>t"
 
 
 map ,s <ESC>
+
+" fzf
+nnoremap <C-p> :FZF<CR>
+
+" max window toggle
+nnoremap <C-W>o :call MaximizeToggle()<CR>
+nnoremap <C-W><C-O> :call MaximizeToggle()<CR>
+
+function! MaximizeToggle()
+    if exists("s:maximize_session")
+        exec "source " . s:maximize_session
+        call delete(s:maximize_session)
+        unlet s:maximize_session
+        let &hidden=s:maximize_hidden_save
+        unlet s:maximize_hidden_save
+    else
+        let s:maximize_hidden_save = &hidden
+        let s:maximize_session = tempname()
+        set hidden
+        exec "mksession! " . s:maximize_session
+        only
+    endif
+endfunction
