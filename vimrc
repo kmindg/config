@@ -46,12 +46,15 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'EasyMotion'
 Plug 'The-NERD-tree'
-Plug 'vim-scripts/Mark--Karkat'
+Plug 'jrosiek/vim-mark'
 Plug 'emezeske/manpageview'
-Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
-autocmd! User YouCompleteMe if !has('vim_starting') | call youcompleteme#Enable() | endif
+"Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
+"autocmd! User YouCompleteMe if !has('vim_starting') | call youcompleteme#Enable() | endif
 "Plug 'rdnetto/YCM-Generator'
-Plug 'Syntastic'
+"Plug 'Syntastic'
+Plug 'Shougo/neocomplete'
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+Plug 'Shougo/neoinclude.vim'
 "Plug 'SuperTab'
 Plug 'taglist.vim'
 "Plug 'Tagbar'
@@ -59,6 +62,7 @@ Plug 'taglist.vim'
 "Plug 'Rip-Rip/clang_complete'
 "Plug 'christoomey/vim-tmux-navigator'
 "Plug 'tpope/vim-dispatch'
+Plug 'jceb/vim-orgmode'
 
 call plug#end()
 
@@ -78,17 +82,11 @@ let Tlist_WinWidth = 40
 " cscope "
 if has("cscope")
 	" set csprg=/usr/local/bin/cscope
-	set csto=1
+    set csprg='gtags-cscope'
+	"set csto=1
 	set cst
 	set nocsverb
 	set cscopequickfix=s-,c-,d-,i-,t-,e-
-	" add any database in current directory
-	if filereadable("cscope.out")
-		cs add cscope.out
-		" else add database pointed to by environment
-	elseif $CSCOPE_DB != ""
-		cs add $CSCOPE_DB
-	endif
 	set csverb
 endif
 
@@ -101,13 +99,21 @@ nmap <Leader>sf :cs find f <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
 nmap <Leader>si :cs find i <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
 nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 
-" cscope.tags.sh example:
+" tags.sh example:
 " #!/bin/bash
-" find . -type f -a \( -path "*interface*" -o -path "*disk/interface*" -o -path "*disk/fbe*" \) -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) > cscope.files || echo "find failed!"
-" ( cscope -Rbq -i cscope.files ) &
-" ( ctags -L cscope.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
+" find . -type f -a \( -path "*interface*" -o -path "*disk/interface*" -o -path "*disk/fbe*" \) -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) > tags.files || echo "find failed!"
+" #( cscope -Rbq -i tags.files ) &
+" ( gtags -f tags.files ) &
+" ( ctags -L tags.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
 " wait
-nmap <silent> <Leader>u :!./cscope.tags.sh&<CR>:silent cscope reset<CR>
+nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
+function! CtagsUpdate()
+    let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\"")
+endfunction
+autocmd BufWritePost *.h call CtagsUpdate()
+autocmd BufWritePost *.hpp call CtagsUpdate()
+autocmd BufWritePost *.cpp call CtagsUpdate()
+autocmd BufWritePost *.cxx call CtagsUpdate()
 
 " YouCompleteMe "
 "let g:ycm_key_invoke_completion = '<C-\>'
@@ -150,28 +156,73 @@ let g:clang_jumpto_declaration_key="<Leader>]"
 "let g:clang_jumpto_declaration_in_preview_key="<Leader>tttttt"
 let g:clang_jumpto_back_key="<Leader>t"
 
+" neocomple "
+"let g:acp_enableAtStartup = 0
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_smart_case = 1
+"let g:neocomplete#auto_completion_start_length = 5
+"let g:neocomplete#sources#syntax#min_keyword_length = 3
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
+
+
 
 map ,s <ESC>
+
+" nvim config
+if has('nvim')
+    "set mouse=
+
+    if exists(':tnoremap')
+        tnoremap <C-h> <C-\><C-n><C-w>h
+        tnoremap <C-j> <C-\><C-n><C-w>j
+        tnoremap <C-k> <C-\><C-n><C-w>k
+        tnoremap <C-l> <C-\><C-n><C-w>l
+    endif
+
+    if exists(':term')
+        nnoremap <Leader>tc  :tabnew<CR>:term<CR>
+        nnoremap <Leader>ts  <C-w>s<C-w>j:term<CR>
+        nnoremap <Leader>tv  <C-w>v<C-w>l:term<CR>
+    endif
+endif
 
 " fzf
 nnoremap <C-p> :FZF<CR>
 
 " max window toggle
-nnoremap <C-W>o :call MaximizeToggle()<CR>
-nnoremap <C-W><C-O> :call MaximizeToggle()<CR>
+nnoremap <C-W>o :call Maximize_Window()<CR>
+nnoremap <C-W>u :call Undo_Maximize_Window()<CR>
 
-function! MaximizeToggle()
+function! Maximize_Window()
+    if exists("s:maximize_session")
+        call delete(s:maximize_session)
+        unlet s:maximize_session
+        unlet s:maximize_hidden_save
+    endif
+
+    let s:maximize_hidden_save = &hidden
+    let s:maximize_session = tempname()
+    set hidden
+    exec "mksession! " . s:maximize_session
+    only
+endfunction
+
+function! Undo_Maximize_Window()
     if exists("s:maximize_session")
         exec "source " . s:maximize_session
         call delete(s:maximize_session)
         unlet s:maximize_session
         let &hidden=s:maximize_hidden_save
         unlet s:maximize_hidden_save
-    else
-        let s:maximize_hidden_save = &hidden
-        let s:maximize_session = tempname()
-        set hidden
-        exec "mksession! " . s:maximize_session
-        only
     endif
 endfunction
+
+" gtags
+let Gtags_Auto_Update = 1
+let Gtags_No_Auto_Jump = 1
+let Gtags_Close_When_Single = 1
+
+" gtags-cscope
+let GtagsCscope_Auto_Load = 1
+let GtagsCscope_Quiet = 1
