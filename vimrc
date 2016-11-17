@@ -36,13 +36,17 @@ syntax on
 set fileencodings=ucs-bom,utf-8,cp936,default,latin1
 set splitbelow
 set splitright
+" :h ture-color
+set termguicolors
+set t_8f=[38;2;%lu;%lu;%lum
+set t_8b=[48;2;%lu;%lu;%lum
 
 " vim-plug "
 call plug#begin('~/.vim/plugged')
 
 " My bundles here:
 " original repos on GitHub
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': 'yes \| ./install' }
 Plug 'junegunn/fzf.vim'
 Plug 'EasyMotion'
 Plug 'The-NERD-tree'
@@ -51,10 +55,12 @@ Plug 'emezeske/manpageview'
 "Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
 "autocmd! User YouCompleteMe if !has('vim_starting') | call youcompleteme#Enable() | endif
 "Plug 'rdnetto/YCM-Generator'
-"Plug 'Syntastic'
+" Plug 'Syntastic'
 Plug 'Shougo/neocomplete'
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 Plug 'Shougo/neoinclude.vim'
+Plug 'Shougo/neosnippet.vim'
+Plug 'Shougo/neosnippet-snippets'
 "Plug 'SuperTab'
 Plug 'taglist.vim'
 "Plug 'Tagbar'
@@ -62,7 +68,8 @@ Plug 'taglist.vim'
 "Plug 'Rip-Rip/clang_complete'
 "Plug 'christoomey/vim-tmux-navigator'
 "Plug 'tpope/vim-dispatch'
-Plug 'jceb/vim-orgmode'
+"Plug 'jceb/vim-orgmode'
+Plug 'davidhalter/jedi-vim'
 
 call plug#end()
 
@@ -92,7 +99,8 @@ endif
 
 nmap <Leader>ss :cs find s <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sg :cs find g <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
-nmap <Leader>sc :cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
+" use cscope to find caller
+nmap <Leader>sc :set csprg=cscope<CR>:cs kill 0<CR>:cs add cscope.out<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR><CR>:set csprg=gtags-cscope<CR>:cs kill 0<CR>:cs add GTAGS<CR>
 nmap <Leader>st :cs find t <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>se :cs find e <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sf :cs find f <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
@@ -102,32 +110,28 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 " tags.sh example:
 " #!/bin/bash
 " find . -type f -a \( -path "*interface*" -o -path "*disk/interface*" -o -path "*disk/fbe*" \) -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) > tags.files || echo "find failed!"
-" #( cscope -Rbq -i tags.files ) &
+" ( cscope -Rbq -i tags.files ) &
 " ( gtags -f tags.files ) &
 " ( ctags -L tags.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
 " wait
 nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
 function! CtagsUpdate()
-    let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\"")
+    let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\" &")
+    let l:result = system("cscope -b -i tags.files &")
 endfunction
 autocmd BufWritePost *.h call CtagsUpdate()
 autocmd BufWritePost *.hpp call CtagsUpdate()
+autocmd BufWritePost *.c call CtagsUpdate()
 autocmd BufWritePost *.cpp call CtagsUpdate()
 autocmd BufWritePost *.cxx call CtagsUpdate()
-
-" YouCompleteMe "
-"let g:ycm_key_invoke_completion = '<C-\>'
-
-" powerline "
-" set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
-" let g:Powerline_symbols = 'fancy'
-" set t_Co=256
 
 " NERDTree "
 let NERDTreeChDirMode=2
 
 " mark "
 nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
+let g:mwDefaultHighlightingPalette = 'extended'
+let g:mwDefaultHighlightingNum = 9
 
 " SuperTab-continued "
 set completeopt-=preview
@@ -149,13 +153,6 @@ if executable('ag')
   let g:ctrlp_use_caching = 0
 endif
 
-" clang_complete "
-"let g:clang_library_path="/home/agong/local/clang+llvm-3.4-x86_64-unknown-ubuntu12.04/lib/"
-"let g:clang_make_default_keymappings=0
-let g:clang_jumpto_declaration_key="<Leader>]"
-"let g:clang_jumpto_declaration_in_preview_key="<Leader>tttttt"
-let g:clang_jumpto_back_key="<Leader>t"
-
 " neocomple "
 "let g:acp_enableAtStartup = 0
 let g:neocomplete#enable_at_startup = 1
@@ -164,7 +161,6 @@ let g:neocomplete#enable_smart_case = 1
 "let g:neocomplete#sources#syntax#min_keyword_length = 3
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
-
 
 
 map ,s <ESC>
