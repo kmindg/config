@@ -46,24 +46,26 @@ call plug#begin('~/.vim/plugged')
 
 " My bundles here:
 " original repos on GitHub
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': 'yes \| ./install' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'EasyMotion'
 Plug 'The-NERD-tree'
 Plug 'jrosiek/vim-mark'
 Plug 'emezeske/manpageview'
-"Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
+Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
 "autocmd! User YouCompleteMe if !has('vim_starting') | call youcompleteme#Enable() | endif
 "Plug 'rdnetto/YCM-Generator'
 " Plug 'Syntastic'
-Plug 'Shougo/neocomplete'
-Plug 'Shougo/vimproc.vim', {'do' : 'make'}
-Plug 'Shougo/neoinclude.vim'
-Plug 'Shougo/neosnippet.vim'
-Plug 'Shougo/neosnippet-snippets'
+
+"Plug 'Shougo/neocomplete'
+"Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+"Plug 'Shougo/neoinclude.vim'
+"Plug 'Shougo/neosnippet.vim'
+"Plug 'Shougo/neosnippet-snippets'
+
 "Plug 'SuperTab'
-Plug 'taglist.vim'
-"Plug 'Tagbar'
+"Plug 'taglist.vim'
+Plug 'majutsushi/tagbar'
 "Plug 'elzr/vim-json'
 "Plug 'Rip-Rip/clang_complete'
 "Plug 'christoomey/vim-tmux-navigator'
@@ -74,17 +76,15 @@ Plug 'davidhalter/jedi-vim'
 call plug#end()
 
 " Tagbar "
-"nnoremap <silent> <F5> :TagbarOpen fj<CR>
-"nnoremap <silent> <F6> :TagbarToggle<CR>
+nnoremap <Leader>tb :TagbarOpenAutoClose<CR>
 
 " taglist "
-"nnoremap <silent> <F5> :TlistToggle<CR>
-nnoremap <Leader>tl :TlistToggle<CR>
-let Tlist_Use_Right_Window = 1
-let Tlist_GainFocus_On_ToggleOpen = 1
-let Tlist_Show_One_File = 1
-let Tlist_Sort_Type = "name"
-let Tlist_WinWidth = 40
+"nnoremap <Leader>tl :TlistToggle<CR>
+"let Tlist_Use_Right_Window = 1
+"let Tlist_GainFocus_On_ToggleOpen = 1
+"let Tlist_Show_One_File = 1
+"let Tlist_Sort_Type = "name"
+"let Tlist_WinWidth = 40
 
 " cscope "
 if has("cscope")
@@ -112,11 +112,11 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 " find . -type f -a \( -path "*interface*" -o -path "*disk/interface*" -o -path "*disk/fbe*" \) -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) > tags.files || echo "find failed!"
 " ( cscope -Rbq -i tags.files ) &
 " ( gtags -f tags.files ) &
-" ( ctags -L tags.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
+" #( ctags -L tags.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
 " wait
 nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
 function! CtagsUpdate()
-    let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\" &")
+    "let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\" &")
     let l:result = system("cscope -b -i tags.files &")
 endfunction
 autocmd BufWritePost *.h call CtagsUpdate()
@@ -215,6 +215,7 @@ function! Undo_Maximize_Window()
 endfunction
 
 " gtags
+"let Gtags_Auto_Map = 1
 let Gtags_Auto_Update = 1
 let Gtags_No_Auto_Jump = 1
 let Gtags_Close_When_Single = 1
@@ -222,3 +223,9 @@ let Gtags_Close_When_Single = 1
 " gtags-cscope
 let GtagsCscope_Auto_Load = 1
 let GtagsCscope_Quiet = 1
+
+" gtags & fzf
+function! s:GT()
+    call fzf#run({'source': 'global -t .* | sed "s/\t.*//"', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
+endfunction
+command! GT call s:GT()
