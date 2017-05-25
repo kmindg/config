@@ -53,24 +53,7 @@ Plug 'The-NERD-tree'
 Plug 'jrosiek/vim-mark'
 Plug 'emezeske/manpageview'
 Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
-"autocmd! User YouCompleteMe if !has('vim_starting') | call youcompleteme#Enable() | endif
-"Plug 'rdnetto/YCM-Generator'
-" Plug 'Syntastic'
-
-"Plug 'Shougo/neocomplete'
-"Plug 'Shougo/vimproc.vim', {'do' : 'make'}
-"Plug 'Shougo/neoinclude.vim'
-"Plug 'Shougo/neosnippet.vim'
-"Plug 'Shougo/neosnippet-snippets'
-
-"Plug 'SuperTab'
-"Plug 'taglist.vim'
 Plug 'majutsushi/tagbar'
-"Plug 'elzr/vim-json'
-"Plug 'Rip-Rip/clang_complete'
-"Plug 'christoomey/vim-tmux-navigator'
-"Plug 'tpope/vim-dispatch'
-"Plug 'jceb/vim-orgmode'
 Plug 'davidhalter/jedi-vim'
 
 call plug#end()
@@ -100,7 +83,7 @@ endif
 nmap <Leader>ss :cs find s <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sg :cs find g <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 " use cscope to find caller
-nmap <Leader>sc :set csprg=cscope<CR>:cs kill 0<CR>:cs add cscope.out<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR><CR>:set csprg=gtags-cscope<CR>:cs kill 0<CR>:cs add GTAGS<CR>
+nmap <Leader>sc :set csprg=cscope<CR>:cs kill 0<CR>:cs add cscope.out<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>:set csprg=gtags-cscope<CR>:cs kill 0<CR>:cs add GTAGS<CR>
 nmap <Leader>st :cs find t <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>se :cs find e <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sf :cs find f <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
