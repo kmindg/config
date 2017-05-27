@@ -55,6 +55,11 @@ fi
 #exec xterm -geometry 80x66+0+0 -name login
 
 xset -b
-setxkbmap -option ctrl:ralt_rctrl
+#setxkbmap -option ctrl:ralt_rctrl
+
+#Swap Ctrl and Caps Lock
+setxkbmap -option ctrl:swapcaps
+
 xset r rate 200 30
+wicd-client --tray &
 exec awesome
