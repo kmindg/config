@@ -52,14 +52,16 @@ Plug 'EasyMotion'
 Plug 'The-NERD-tree'
 Plug 'jrosiek/vim-mark'
 Plug 'emezeske/manpageview'
-Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp'], 'do': './install.py --clang-completer' }
+Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp', 'rust'], 'do': './install.py --clang-completer --racer-completer' }
 Plug 'majutsushi/tagbar'
 Plug 'davidhalter/jedi-vim'
+Plug 'rust-lang/rust.vim'
+Plug 'tommcdo/vim-kangaroo'
 
 call plug#end()
 
 " Tagbar "
-nnoremap <Leader>tb :TagbarOpenAutoClose<CR>
+"nnoremap <Leader>tb :TagbarOpenAutoClose<CR>
 
 " taglist "
 "nnoremap <Leader>tl :TlistToggle<CR>
@@ -212,3 +214,10 @@ function! s:GT()
     call fzf#run({'source': 'global -t .* | sed "s/\t.*//"', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
 endfunction
 command! GT call s:GT()
+
+" kangaroo
+nmap <Leader>t <Esc>zP
+
+" YCM
+"let g:ycm_rust_src_path = '~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src'
+nmap <Leader>] <Esc>zp:YcmCompleter GoTo<CR>
