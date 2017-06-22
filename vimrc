@@ -48,8 +48,8 @@ call plug#begin('~/.vim/plugged')
 " original repos on GitHub
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'EasyMotion'
-Plug 'The-NERD-tree'
+Plug 'easymotion/vim-easymotion'
+Plug 'scrooloose/nerdtree'
 Plug 'jrosiek/vim-mark'
 Plug 'emezeske/manpageview'
 Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp', 'rust'], 'do': './install.py --clang-completer --racer-completer' }
@@ -120,9 +120,6 @@ let g:mwDefaultHighlightingNum = 9
 
 " SuperTab-continued "
 set completeopt-=preview
-
-" EasyMotion "
-let g:EasyMotion_keys = 'bceghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZasdf'
 
 autocmd BufNewFile,BufRead *.ovsschema set filetype=json
 
