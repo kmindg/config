@@ -218,3 +218,6 @@ nmap <Leader>t <Esc>zP
 " YCM
 "let g:ycm_rust_src_path = '~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src'
 nmap <Leader>] <Esc>zp:YcmCompleter GoTo<CR>
+
+" rust.vim
+autocmd BufRead,BufNewFile Cargo.toml,Cargo.lock,*.rs compiler cargo
