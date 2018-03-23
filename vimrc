@@ -30,12 +30,12 @@ set ruler		    " show the cursor position all the time
 set showcmd		    " display incomplete commands
 set incsearch		" do incremental searching
 set hlsearch
-set cinoptions+=(0,:0,l1
+set cinoptions+=j1,(0,:0,l1
 syntax on
 "set textwidth=79
 set fileencodings=ucs-bom,utf-8,cp936,default,latin1
-set splitbelow
-set splitright
+"set splitbelow
+"set splitright
 " :h ture-color
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
@@ -46,6 +46,7 @@ call plug#begin('~/.vim/plugged')
 
 " My bundles here:
 " original repos on GitHub
+Plug 'ervandew/supertab'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'easymotion/vim-easymotion'
@@ -57,6 +58,10 @@ Plug 'majutsushi/tagbar'
 Plug 'davidhalter/jedi-vim'
 Plug 'rust-lang/rust.vim'
 Plug 'tommcdo/vim-kangaroo'
+Plug 'tpope/vim-fugitive'
+Plug 'justinmk/vim-syntax-extra'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
 call plug#end()
 
@@ -127,12 +132,13 @@ autocmd BufNewFile,BufRead *.ovsschema set filetype=json
 if executable('ag')
   " Use ag over grep
   set grepprg=ag\ --nogroup\ --nocolor
+endif
 
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-
-  " ag is fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching = 0
+" ripgrep
+if executable('rg')
+  " Use rg over grep
+  set grepprg=rg\ --vimgrep\ --no-heading
+  set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 
 " neocomple "
@@ -217,7 +223,23 @@ nmap <Leader>t <Esc>zP
 
 " YCM
 "let g:ycm_rust_src_path = '~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src'
+"make YCM compatible with UltiSnips (using supertab)
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:SuperTabDefaultCompletionType = '<C-n>'
 nmap <Leader>] <Esc>zp:YcmCompleter GoTo<CR>
 
 " rust.vim
 autocmd BufRead,BufNewFile Cargo.toml,Cargo.lock,*.rs compiler cargo
+
+" highlight tailing space
+let c_space_errors = 1
+
+" Ultisnips
+let g:UltiSnipsExpandTrigger="<leader>e"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+let g:UltiSnipsListSnippets="<leader>l"
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
