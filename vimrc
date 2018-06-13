@@ -40,6 +40,7 @@ set fileencodings=ucs-bom,utf-8,cp936,default,latin1
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
+set noswapfile
 
 " vim-plug "
 call plug#begin('~/.vim/plugged')
@@ -50,7 +51,7 @@ Plug 'ervandew/supertab'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'easymotion/vim-easymotion'
-Plug 'scrooloose/nerdtree'
+"Plug 'scrooloose/nerdtree'
 Plug 'jrosiek/vim-mark'
 Plug 'emezeske/manpageview'
 Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp', 'rust'], 'do': './install.py --clang-completer --racer-completer' }
@@ -62,6 +63,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'justinmk/vim-syntax-extra'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
+Plug 'vimwiki/vimwiki'
 
 call plug#end()
 
@@ -90,7 +92,8 @@ endif
 nmap <Leader>ss :cs find s <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sg :cs find g <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 " use cscope to find caller
-nmap <Leader>sc :set csprg=cscope<CR>:cs kill 0<CR>:cs add cscope.out<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>:set csprg=gtags-cscope<CR>:cs kill 0<CR>:cs add GTAGS<CR>
+"nmap <Leader>sc :set csprg=cscope<CR>:cs kill 0<CR>:cs add cscope.out<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>:set csprg=gtags-cscope<CR>:cs kill 0<CR>:cs add GTAGS<CR>
+nmap <Leader>sc :cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>st :cs find t <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>se :cs find e <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sf :cs find f <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
@@ -105,15 +108,15 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 " #( ctags -L tags.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
 " wait
 nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
-function! CtagsUpdate()
-    "let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\" &")
-    let l:result = system("cscope -b -i tags.files &")
-endfunction
-autocmd BufWritePost *.h call CtagsUpdate()
-autocmd BufWritePost *.hpp call CtagsUpdate()
-autocmd BufWritePost *.c call CtagsUpdate()
-autocmd BufWritePost *.cpp call CtagsUpdate()
-autocmd BufWritePost *.cxx call CtagsUpdate()
+"function! CtagsUpdate()
+"    let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\" &")
+"    let l:result = system("cscope -b -i tags.files &")
+"endfunction
+"autocmd BufWritePost *.h call CtagsUpdate()
+"autocmd BufWritePost *.hpp call CtagsUpdate()
+"autocmd BufWritePost *.c call CtagsUpdate()
+"autocmd BufWritePost *.cpp call CtagsUpdate()
+"autocmd BufWritePost *.cxx call CtagsUpdate()
 
 " NERDTree "
 let NERDTreeChDirMode=2
@@ -131,7 +134,7 @@ autocmd BufNewFile,BufRead *.ovsschema set filetype=json
 " The Silver Searcher "
 if executable('ag')
   " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor
+  set grepprg=ag\ --nogroup\ --nocolor\ --vimgrep
 endif
 
 " ripgrep
@@ -151,7 +154,9 @@ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
 
 
-map ,s <ESC>
+nnoremap <Leader>s <ESC>
+nnoremap <Leader>ex :Ex<CR>
+tnoremap <Esc> <C-W>N
 
 " nvim config
 if has('nvim')
