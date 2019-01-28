@@ -89,8 +89,9 @@ nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
 let g:mwDefaultHighlightingPalette = 'extended'
 let g:mwDefaultHighlightingNum = 9
 
-" SuperTab-continued "
+" SuperTab "
 "set completeopt-=preview
+let g:SuperTabDefaultCompletionType = '<c-n>'
 
 autocmd BufNewFile,BufRead *.ovsschema set filetype=json
 
