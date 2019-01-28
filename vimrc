@@ -30,17 +30,14 @@ set ruler		    " show the cursor position all the time
 set showcmd		    " display incomplete commands
 set incsearch		" do incremental searching
 set hlsearch
-set cinoptions+=j1,(0,:0,l1
+set cinoptions+=j1,(0,:0,l1,g0
 syntax on
 "set textwidth=79
 set fileencodings=ucs-bom,utf-8,cp936,default,latin1
-"set splitbelow
-"set splitright
 " :h ture-color
 set termguicolors
 set t_8f=[38;2;%lu;%lu;%lum
 set t_8b=[48;2;%lu;%lu;%lum
-set noswapfile
 
 " vim-plug "
 call plug#begin('~/.vim/plugged')
@@ -51,10 +48,8 @@ Plug 'ervandew/supertab'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'easymotion/vim-easymotion'
-"Plug 'scrooloose/nerdtree'
 Plug 'jrosiek/vim-mark'
 Plug 'emezeske/manpageview'
-Plug 'Valloric/YouCompleteMe', { 'for': ['c', 'cpp', 'rust'], 'do': './install.py --clang-completer --racer-completer' }
 Plug 'majutsushi/tagbar'
 Plug 'davidhalter/jedi-vim'
 Plug 'rust-lang/rust.vim'
@@ -64,35 +59,16 @@ Plug 'justinmk/vim-syntax-extra'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'vimwiki/vimwiki'
+Plug 'w0rp/ale'
+Plug 'CharlesGueunet/VimFilify'
 
 call plug#end()
 
 " Tagbar "
 "nnoremap <Leader>tb :TagbarOpenAutoClose<CR>
 
-" taglist "
-"nnoremap <Leader>tl :TlistToggle<CR>
-"let Tlist_Use_Right_Window = 1
-"let Tlist_GainFocus_On_ToggleOpen = 1
-"let Tlist_Show_One_File = 1
-"let Tlist_Sort_Type = "name"
-"let Tlist_WinWidth = 40
-
-" cscope "
-if has("cscope")
-	" set csprg=/usr/local/bin/cscope
-    set csprg='gtags-cscope'
-	"set csto=1
-	set cst
-	set nocsverb
-	set cscopequickfix=s-,c-,d-,i-,t-,e-
-	set csverb
-endif
-
 nmap <Leader>ss :cs find s <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sg :cs find g <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
-" use cscope to find caller
-"nmap <Leader>sc :set csprg=cscope<CR>:cs kill 0<CR>:cs add cscope.out<CR>:cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>:set csprg=gtags-cscope<CR>:cs kill 0<CR>:cs add GTAGS<CR>
 nmap <Leader>sc :cs find c <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>st :cs find t <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>se :cs find e <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
@@ -102,24 +78,11 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 
 " tags.sh example:
 " #!/bin/bash
-" find . -type f -a \( -path "*interface*" -o -path "*disk/interface*" -o -path "*disk/fbe*" \) -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) > tags.files || echo "find failed!"
-" ( cscope -Rbq -i tags.files ) &
-" ( gtags -f tags.files ) &
-" #( ctags -L tags.files --c++-kinds=+p --fields=+iaS --extra=+q -I ~/.vim/tags_ignore ) &
-" wait
+" mkdir -p .gtags_tmp
+" find cyc_platform cyc_app -type f -a \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" -o -name '*.cxx' -o -name '*.hxx' -o -name '*.py' \) | gtags --gtagslabel native-pygments -f - .gtags_tmp
+" mv .gtags_tmp/G* ./
+" rm -r .gtags_tmp
 nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
-"function! CtagsUpdate()
-"    let l:result = system("ctags --c++-kinds=+p --fields=+iaS --extra=+q -a \"" . expand("%") . "\" &")
-"    let l:result = system("cscope -b -i tags.files &")
-"endfunction
-"autocmd BufWritePost *.h call CtagsUpdate()
-"autocmd BufWritePost *.hpp call CtagsUpdate()
-"autocmd BufWritePost *.c call CtagsUpdate()
-"autocmd BufWritePost *.cpp call CtagsUpdate()
-"autocmd BufWritePost *.cxx call CtagsUpdate()
-
-" NERDTree "
-let NERDTreeChDirMode=2
 
 " mark "
 nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
@@ -127,36 +90,22 @@ let g:mwDefaultHighlightingPalette = 'extended'
 let g:mwDefaultHighlightingNum = 9
 
 " SuperTab-continued "
-set completeopt-=preview
+"set completeopt-=preview
 
 autocmd BufNewFile,BufRead *.ovsschema set filetype=json
 
-" The Silver Searcher "
-if executable('ag')
-  " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor\ --vimgrep
-endif
-
-" ripgrep
 if executable('rg')
   " Use rg over grep
   set grepprg=rg\ --vimgrep\ --no-heading
   set grepformat=%f:%l:%c:%m,%f:%l:%m
+elseif executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor\ --vimgrep
 endif
-
-" neocomple "
-"let g:acp_enableAtStartup = 0
-let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#enable_smart_case = 1
-"let g:neocomplete#auto_completion_start_length = 5
-"let g:neocomplete#sources#syntax#min_keyword_length = 3
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
-
 
 nnoremap <Leader>s <ESC>
 nnoremap <Leader>ex :Ex<CR>
-tnoremap <Esc> <C-W>N
+"tnoremap <Esc> <C-W>N
 
 " nvim config
 if has('nvim')
@@ -216,23 +165,23 @@ let Gtags_Close_When_Single = 1
 " gtags-cscope
 let GtagsCscope_Auto_Load = 1
 let GtagsCscope_Quiet = 1
+if has("cscope")
+    set csprg='gtags-cscope'
+	set cst
+	set nocsverb
+	set cscopequickfix=s-,c-,d-,i-,t-,e-
+	set csverb
+endif
+
 
 " gtags & fzf
 function! s:GT()
-    call fzf#run({'source': 'global -t .* | sed "s/\t.*//"', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
+    call fzf#run({'source': 'global -q -t .* | sed "s/\t.*//"', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
 endfunction
 command! GT call s:GT()
 
 " kangaroo
 nmap <Leader>t <Esc>zP
-
-" YCM
-"let g:ycm_rust_src_path = '~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src'
-"make YCM compatible with UltiSnips (using supertab)
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-let g:SuperTabDefaultCompletionType = '<C-n>'
-nmap <Leader>] <Esc>zp:YcmCompleter GoTo<CR>
 
 " rust.vim
 autocmd BufRead,BufNewFile Cargo.toml,Cargo.lock,*.rs compiler cargo
@@ -248,3 +197,18 @@ let g:UltiSnipsListSnippets="<leader>l"
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
+
+" ALE
+let g:ale_enabled=0
+let g:ale_c_build_dir='cyc_app/cyclone/debug/simulation'
+let g:ale_c_parse_compile_commands=1
+let g:ale_cpp_cppcheck_options='--enable=warning,style,performance,information,missingInclude --suppress=cstyleCast'
+let g:ale_linters = { 'c': ['clangcheck', 'clangtidy', 'cppcheck'],
+            \ 'cpp': ['clangcheck', 'clangtidy', 'cppcheck'] }
+let g:ale_python_pylint_executable='pylint2'
+
+augroup ale_config
+    autocmd FileType c,cpp let g:custom_cpp_options = Filify#process('.ale_config', {'default_return':'-std=c++11 -Wall'})
+    autocmd FileType c,cpp let g:ale_cpp_clang_options = g:custom_cpp_options
+    autocmd FileType c,cpp let g:ale_cpp_gcc_options = g:custom_cpp_options
+augroup END
