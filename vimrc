@@ -8,7 +8,7 @@ let maplocalleader=","
 " vim commom setting "
 "scriptencoding utf-8
 "set encoding=utf-8
-colo desert
+set bg=dark
 set scrolloff=2
 set ignorecase
 set smartcase
@@ -34,10 +34,15 @@ set cinoptions+=j1,(0,:0,l1,g0
 syntax on
 "set textwidth=79
 set fileencodings=ucs-bom,utf-8,cp936,default,latin1
-" :h ture-color
-set termguicolors
-set t_8f=[38;2;%lu;%lu;%lum
-set t_8b=[48;2;%lu;%lu;%lum
+if exists('+termguicolors')
+    " :h xterm-true-color
+    set termguicolors
+    set t_8f=[38;2;%lu;%lu;%lum
+    set t_8b=[48;2;%lu;%lu;%lum
+endif
+
+nnoremap ,tt :term ++close tail -F %<CR>
+nmap ,bd :bp<bar>sp<bar>bn<bar>bd<CR>
 
 " vim-plug "
 call plug#begin('~/.vim/plugged')
@@ -48,7 +53,8 @@ Plug 'ervandew/supertab'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'easymotion/vim-easymotion'
-Plug 'jrosiek/vim-mark'
+Plug 'inkarkat/vim-ingo-library'
+Plug 'inkarkat/vim-mark'
 Plug 'emezeske/manpageview'
 Plug 'majutsushi/tagbar'
 Plug 'davidhalter/jedi-vim'
@@ -56,13 +62,23 @@ Plug 'rust-lang/rust.vim'
 Plug 'tommcdo/vim-kangaroo'
 Plug 'tpope/vim-fugitive'
 Plug 'justinmk/vim-syntax-extra'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
 Plug 'vimwiki/vimwiki'
-Plug 'w0rp/ale'
-Plug 'CharlesGueunet/VimFilify'
+Plug 'vmchale/ion-vim'
+Plug 'prabirshrestha/async.vim' " required by vim-lsp
+Plug 'prabirshrestha/vim-lsp'
+Plug 'jackguo380/vim-lsp-cxx-highlight'
+Plug 'morhetz/gruvbox'
+Plug 'zxqfl/tabnine-vim'
+
 
 call plug#end()
+
+
+" gruvbox "
+colo gruvbox
+"autocmd vimenter * colorscheme gruvbox
+let g:gruvbox_bold=0
+let g:gruvbox_italic=1
 
 " Tagbar "
 "nnoremap <Leader>tb :TagbarOpenAutoClose<CR>
@@ -85,6 +101,7 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
 
 " mark "
+nmap <unique> <silent> <Leader>M <Plug>MarkToggle
 nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
 let g:mwDefaultHighlightingPalette = 'extended'
 let g:mwDefaultHighlightingNum = 9
@@ -188,28 +205,28 @@ nmap <Leader>t <Esc>zP
 autocmd BufRead,BufNewFile Cargo.toml,Cargo.lock,*.rs compiler cargo
 
 " highlight tailing space
-let c_space_errors = 1
+" let c_space_errors = 1
 
-" Ultisnips
-let g:UltiSnipsExpandTrigger="<leader>e"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsListSnippets="<leader>l"
-
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
-
-" ALE
-let g:ale_enabled=0
-let g:ale_c_build_dir='cyc_app/cyclone/debug/simulation'
-let g:ale_c_parse_compile_commands=1
-let g:ale_cpp_cppcheck_options='--enable=warning,style,performance,information,missingInclude --suppress=cstyleCast'
-let g:ale_linters = { 'c': ['clangcheck', 'clangtidy', 'cppcheck'],
-            \ 'cpp': ['clangcheck', 'clangtidy', 'cppcheck'] }
-let g:ale_python_pylint_executable='pylint2'
-
-augroup ale_config
-    autocmd FileType c,cpp let g:custom_cpp_options = Filify#process('.ale_config', {'default_return':'-std=c++11 -Wall'})
-    autocmd FileType c,cpp let g:ale_cpp_clang_options = g:custom_cpp_options
-    autocmd FileType c,cpp let g:ale_cpp_gcc_options = g:custom_cpp_options
-augroup END
+" ccls & vim-lsp
+let g:lsp_diagnostics_enabled = 0
+let g:lsp_signs_enabled = 0
+let g:lsp_semantic_enabled=1
+" Register ccls C++ lanuage server.
+if executable('ccls')
+   au User lsp_setup call lsp#register_server({
+      \ 'name': 'ccls',
+      \ 'cmd': {server_info->['ccls']},
+      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      \ 'initialization_options': {
+      \   'cache': {'directory': '/tmp/ccls/cache' },
+      \   'highlight': {'lsRanges': v:false },
+      \ },
+      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc', 'cxx'],
+      \ })
+endif
+" Key bindings for vim-lsp
+ " TODO: put into ftplugin later
+nnoremap <silent> <Leader>ld :LspDefinition<CR>
+nnoremap <silent> <Leader>lr :LspReferences<CR>
+nnoremap <silent> <Leader>lw :LspWorkspaceSymbol<CR>
+"nnoremap <silent> <Leader>lds :LspDocumentSymbol<CR>
