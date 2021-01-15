@@ -69,6 +69,7 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'morhetz/gruvbox'
 Plug 'zxqfl/tabnine-vim'
+Plug 'vimoutliner/vimoutliner'
 
 
 call plug#end()
@@ -185,10 +186,10 @@ let GtagsCscope_Auto_Load = 1
 let GtagsCscope_Quiet = 1
 if has("cscope")
     set csprg='gtags-cscope'
-	set cst
-	set nocsverb
-	set cscopequickfix=s-,c-,d-,i-,t-,e-
-	set csverb
+    set cst
+    set nocsverb
+    set cscopequickfix=s-,c-,d-,i-,t-,e-
+    set csverb
 endif
 
 
@@ -210,23 +211,58 @@ autocmd BufRead,BufNewFile Cargo.toml,Cargo.lock,*.rs compiler cargo
 " ccls & vim-lsp
 let g:lsp_diagnostics_enabled = 0
 let g:lsp_signs_enabled = 0
-let g:lsp_semantic_enabled=1
+let g:lsp_semantic_enabled = 1
 " Register ccls C++ lanuage server.
 if executable('ccls')
    au User lsp_setup call lsp#register_server({
-      \ 'name': 'ccls',
-      \ 'cmd': {server_info->['ccls']},
-      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-      \ 'initialization_options': {
-      \   'cache': {'directory': '/tmp/ccls/cache' },
-      \   'highlight': {'lsRanges': v:false },
-      \ },
-      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc', 'cxx'],
-      \ })
+       \ 'name': 'ccls',
+       \ 'cmd': {server_info->['ccls']},
+       \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+       \ 'initialization_options': {
+       \   'cache': {'directory': '/tmp/ccls/cache' },
+       \   'highlight': {'lsRanges': v:true },
+       \   'index': {'initialBlacklist': ["."]},
+       \ },
+       \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc', 'cxx'],
+       \ })
 endif
-" Key bindings for vim-lsp
- " TODO: put into ftplugin later
-nnoremap <silent> <Leader>ld :LspDefinition<CR>
-nnoremap <silent> <Leader>lr :LspReferences<CR>
-nnoremap <silent> <Leader>lw :LspWorkspaceSymbol<CR>
-"nnoremap <silent> <Leader>lds :LspDocumentSymbol<CR>
+" ccls --index=. --log-file=output --init='{"cache": {"directory": "/tmp/ccls/cache" }}'
+" Register python-language-server as python lanuage server.
+if executable('pyls')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pyls',
+        \ 'cmd': {server_info->['pyls']},
+        \ 'whitelist': ['python'],
+        \ })
+endif
+" " Key bindings for vim-lsp
+"  " TODO: put into ftplugin later
+" nnoremap <silent> <Leader>ld :LspDefinition<CR>
+" nnoremap <silent> <Leader>lr :LspReferences<CR>
+" nnoremap <silent> <Leader>lt :LspDocumentDiagnostic<CR>
+" "nnoremap <silent> <Leader>lw :LspWorkspaceSymbol<CR>
+" "nnoremap <silent> <Leader>lds :LspDocumentSymbol<CR>
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    "setlocal signcolumn=yes
+    "if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> g] <plug>(lsp-definition)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
+    nmap <buffer> K <plug>(lsp-hover)
+
+    let g:lsp_format_sync_timeout = 1000
+    autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+    
+    " refer to doc to add more commands
+endfunction
+
+augroup lsp_install
+    au!
+    " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
