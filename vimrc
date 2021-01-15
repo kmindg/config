@@ -64,13 +64,14 @@ Plug 'tpope/vim-fugitive'
 Plug 'justinmk/vim-syntax-extra'
 Plug 'vimwiki/vimwiki'
 Plug 'vmchale/ion-vim'
-Plug 'prabirshrestha/async.vim' " required by vim-lsp
+" required by vim-lsp
+Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'morhetz/gruvbox'
-Plug 'zxqfl/tabnine-vim'
+"Plug 'zxqfl/tabnine-vim'
 Plug 'vimoutliner/vimoutliner'
-
+Plug 'nathangrigg/vim-beancount'
 
 call plug#end()
 
@@ -102,8 +103,8 @@ nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
 
 " mark "
-nmap <unique> <silent> <Leader>M <Plug>MarkToggle
-nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
+nmap <silent> <Leader>M <Plug>MarkToggle
+nmap <silent> <Leader>N <Plug>MarkAllClear
 let g:mwDefaultHighlightingPalette = 'extended'
 let g:mwDefaultHighlightingNum = 9
 
@@ -195,7 +196,7 @@ endif
 
 " gtags & fzf
 function! s:GT()
-    call fzf#run({'source': 'global -q -t .* | sed "s/\t.*//"', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
+    call fzf#run({'source': 'global -q -t ".*" | sd "\t.*" ""', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
 endfunction
 command! GT call s:GT()
 
@@ -266,3 +267,6 @@ augroup lsp_install
     " call s:on_lsp_buffer_enabled only for languages that has the server registered.
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
+
+" beancount
+autocmd FileType beancount let b:beancount_root="/home/archer/ledger/main.beancount"
