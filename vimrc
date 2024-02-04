@@ -57,7 +57,7 @@ Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'emezeske/manpageview'
 Plug 'majutsushi/tagbar'
-Plug 'davidhalter/jedi-vim'
+"Plug 'davidhalter/jedi-vim'
 Plug 'rust-lang/rust.vim'
 Plug 'tommcdo/vim-kangaroo'
 Plug 'tpope/vim-fugitive'
@@ -67,11 +67,16 @@ Plug 'vmchale/ion-vim'
 " required by vim-lsp
 Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
 Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'morhetz/gruvbox'
 "Plug 'zxqfl/tabnine-vim'
 Plug 'vimoutliner/vimoutliner'
-Plug 'nathangrigg/vim-beancount'
+"Plug 'nathangrigg/vim-beancount'
+Plug 'cespare/vim-toml', { 'branch': 'main'}
+Plug 'skywind3000/asyncrun.vim'
+"Plug 'Exafunction/codeium.vim', { 'branch': 'main' }
+Plug 'github/copilot.vim'
 
 call plug#end()
 
@@ -93,6 +98,9 @@ nmap <Leader>se :cs find e <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
 nmap <Leader>sf :cs find f <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
 nmap <Leader>si :cs find i <C-R>=expand("<cfile>")<CR><CR>:bot cw<CR>
 nmap <Leader>sd :cs find d <C-R>=expand("<cword>")<CR><CR>:bot cw<CR>
+
+nmap <c-j> :cn<CR>
+nmap <c-k> :cp<CR>
 
 " tags.sh example:
 " #!/bin/bash
@@ -196,7 +204,8 @@ endif
 
 " gtags & fzf
 function! s:GT()
-    call fzf#run({'source': 'global -q -t ".*" | sd "\t.*" ""', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
+"    call fzf#run({'source': 'global -q -t ".*" | sd "\t.*" ""', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
+    call fzf#run({'source': 'global -q -t ".*" | sed "s/\t.*//"', 'sink': 'tag', 'options': '-m --tiebreak=begin --prompt "Gtags>"'})
 endfunction
 command! GT call s:GT()
 
@@ -209,10 +218,19 @@ autocmd BufRead,BufNewFile Cargo.toml,Cargo.lock,*.rs compiler cargo
 " highlight tailing space
 " let c_space_errors = 1
 
+" vim-lsp-settings
+let g:lsp_settings_filetype_python = 'pyright-langserver'
+let g:lsp_settings = {
+\     'clangd': {
+\       'disabled': 1,
+\     }
+\}
+
 " ccls & vim-lsp
 let g:lsp_diagnostics_enabled = 0
 let g:lsp_signs_enabled = 0
 let g:lsp_semantic_enabled = 1
+let g:lsp_signature_help_enabled = 0
 " Register ccls C++ lanuage server.
 if executable('ccls')
    au User lsp_setup call lsp#register_server({
@@ -220,7 +238,7 @@ if executable('ccls')
        \ 'cmd': {server_info->['ccls']},
        \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
        \ 'initialization_options': {
-       \   'cache': {'directory': '/tmp/ccls/cache' },
+       \   'cache': {'directory': '/home/cyc/.cache/ccls' },
        \   'highlight': {'lsRanges': v:true },
        \   'index': {'initialBlacklist': ["."]},
        \ },
@@ -229,13 +247,13 @@ if executable('ccls')
 endif
 " ccls --index=. --log-file=output --init='{"cache": {"directory": "/tmp/ccls/cache" }}'
 " Register python-language-server as python lanuage server.
-if executable('pyls')
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'pyls',
-        \ 'cmd': {server_info->['pyls']},
-        \ 'whitelist': ['python'],
-        \ })
-endif
+" if executable('pyls')
+"     au User lsp_setup call lsp#register_server({
+"         \ 'name': 'pyls',
+"         \ 'cmd': {server_info->['pyls']},
+"         \ 'whitelist': ['python'],
+"         \ })
+" endif
 " " Key bindings for vim-lsp
 "  " TODO: put into ftplugin later
 " nnoremap <silent> <Leader>ld :LspDefinition<CR>
@@ -269,4 +287,11 @@ augroup lsp_install
 augroup END
 
 " beancount
-autocmd FileType beancount let b:beancount_root="/home/archer/ledger/main.beancount"
+"autocmd FileType beancount let b:beancount_root="/home/archer/ledger/main.beancount"
+
+let g:asyncrun_open = 10
+
+" Codeium
+" let g:codeium_server_config = {
+"   \'portal_url': 'https://codeium.delllabs.net',
+"   \'api_url': 'https://codeium.delllabs.net/_route/api_server' }
