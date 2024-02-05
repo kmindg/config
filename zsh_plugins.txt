@@ -1,0 +1,12 @@
+#djui/alias-tips
+zsh-users/zsh-completions
+mafredri/zsh-async
+jeffreytse/zsh-vi-mode
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-history-substring-search
+
+
+
+# these should be at last!
+sindresorhus/pure
+zsh-users/zsh-history-substring-search             
