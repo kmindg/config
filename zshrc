@@ -26,6 +26,7 @@ alias gl="git log"
 alias gd="git diff"
 alias gdca="git diff --cached"
 alias gb="git branch"
+alias gs="git switch"
 alias ll="ls -lh"
 
 PURE_GIT_PULL=0
