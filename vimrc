@@ -63,20 +63,15 @@ Plug 'tommcdo/vim-kangaroo'
 Plug 'tpope/vim-fugitive'
 Plug 'justinmk/vim-syntax-extra'
 Plug 'vimwiki/vimwiki'
-Plug 'vmchale/ion-vim'
-" required by vim-lsp
-Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/async.vim' " required by vim-lsp
 Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
-Plug 'jackguo380/vim-lsp-cxx-highlight'
+"Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'morhetz/gruvbox'
 "Plug 'zxqfl/tabnine-vim'
 Plug 'vimoutliner/vimoutliner'
-"Plug 'nathangrigg/vim-beancount'
 Plug 'cespare/vim-toml', { 'branch': 'main'}
 Plug 'skywind3000/asyncrun.vim'
-"Plug 'Exafunction/codeium.vim', { 'branch': 'main' }
-Plug 'github/copilot.vim'
 
 call plug#end()
 
@@ -111,8 +106,8 @@ nmap <c-k> :cp<CR>
 nmap <silent> <Leader>u :!./tags.sh&<CR>:silent cscope reset<CR>
 
 " mark "
-nmap <silent> <Leader>M <Plug>MarkToggle
-nmap <silent> <Leader>N <Plug>MarkAllClear
+nmap <unique> <silent> <Leader>M <Plug>MarkToggle
+nmap <unique> <silent> <Leader>N <Plug>MarkAllClear
 let g:mwDefaultHighlightingPalette = 'extended'
 let g:mwDefaultHighlightingNum = 9
 
@@ -227,10 +222,13 @@ let g:lsp_settings = {
 \}
 
 " ccls & vim-lsp
-let g:lsp_diagnostics_enabled = 0
-let g:lsp_signs_enabled = 0
+let g:lsp_diagnostics_enabled = 1
+let g:lsp_diagnostics_virtual_text_enabled = 1
+let g:lsp_diagnostics_virtual_text_align = "right"
+
+let g:lsp_signs_enabled = 1
 let g:lsp_semantic_enabled = 1
-let g:lsp_signature_help_enabled = 0
+let g:lsp_signature_help_enabled = 1
 " Register ccls C++ lanuage server.
 if executable('ccls')
    au User lsp_setup call lsp#register_server({
@@ -240,12 +238,12 @@ if executable('ccls')
        \ 'initialization_options': {
        \   'cache': {'directory': '/home/cyc/.cache/ccls' },
        \   'highlight': {'lsRanges': v:true },
-       \   'index': {'initialBlacklist': ["."]},
+       \   'index': {'initialBlacklist': []},
        \ },
        \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc', 'cxx'],
        \ })
 endif
-" ccls --index=. --log-file=output --init='{"cache": {"directory": "/tmp/ccls/cache" }}'
+" ccls --index=. --log-file=output --init='{"cache": {"directory": "/tmp/ccls/cache" }}' -v=1
 " Register python-language-server as python lanuage server.
 " if executable('pyls')
 "     au User lsp_setup call lsp#register_server({
@@ -273,6 +271,7 @@ function! s:on_lsp_buffer_enabled() abort
     nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
     nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
     nmap <buffer> K <plug>(lsp-hover)
+    nmap <buffer> gw <plug>(lsp-workspace-symbol)
 
     let g:lsp_format_sync_timeout = 1000
     autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
@@ -286,12 +285,4 @@ augroup lsp_install
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
 
-" beancount
-"autocmd FileType beancount let b:beancount_root="/home/archer/ledger/main.beancount"
-
 let g:asyncrun_open = 10
-
-" Codeium
-" let g:codeium_server_config = {
-"   \'portal_url': 'https://codeium.delllabs.net',
-"   \'api_url': 'https://codeium.delllabs.net/_route/api_server' }
