@@ -31,6 +31,7 @@ set showcmd		    " display incomplete commands
 set incsearch		" do incremental searching
 set hlsearch
 set cinoptions+=j1,(0,:0,l1,g0
+set matchpairs+=<:>
 syntax on
 "set textwidth=79
 set fileencodings=ucs-bom,utf-8,cp936,default,latin1
@@ -66,7 +67,7 @@ Plug 'vimwiki/vimwiki'
 Plug 'prabirshrestha/async.vim' " required by vim-lsp
 Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
-"Plug 'jackguo380/vim-lsp-cxx-highlight'
+"Plug 'jackguo380/vim-lsp-cxx-highlight'  after vim9, it causes vim to crash. Disable it for now
 Plug 'morhetz/gruvbox'
 "Plug 'zxqfl/tabnine-vim'
 Plug 'vimoutliner/vimoutliner'
@@ -286,3 +287,6 @@ augroup lsp_install
 augroup END
 
 let g:asyncrun_open = 10
+
+" vimwiki
+let g:vimwiki_url_maxsave=0
